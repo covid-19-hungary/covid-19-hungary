@@ -42,7 +42,10 @@ function handleMessage(prevState, message) {
 
 const formatDate = day => {
     let date = new Date(2020, 2, 4 + day); // starts from 2020-03-04
-    return `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+    let year = date.getFullYear();
+    let mm = (date.getMonth() + 1).toString().padStart(2, '0');
+    let dd = date.getDate().toString().padStart(2, '0');
+    return `${year}-${mm}-${dd}`;
 }
 
 module.exports = {
