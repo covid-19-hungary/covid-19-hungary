@@ -35,22 +35,22 @@ function handleMessage(prevState, message) {
             quickReplies: quickReplies(2)
         };
 
-    } else if(message == "Washing hands, Avoid to touch your face") {
+    } else if(message == "🧼👏, 🚫🤦") {
         return {
             responses: ["Good one!! the contagious rate decrease",
-                        "Check Next day to see the result of your measure"],
+                        "Check the 'next day' to inspect the result of your measure."],
             quickReplies: quickReplies(2)
         };
-    } else if(message == "Buy tons of toilet paper"){
+    } else if(message == "Buy tons of 🧻"){
         return {
             responses: ["Boo!! you are not helping at all"],
             quickReplies: quickReplies(2)
         };
 
-    } else if(message == "Identify positive cases and isolate"){
+    } else if(message == "Isolate all cases"){
         return {
             responses: ["Good one!! the contagious rate decrease",
-                        "Check  Next day to see the result of your measure"],
+                        "Check the 'next day' to inspect the result of your measure."],
             quickReplies: quickReplies(2)
         };
 
@@ -89,9 +89,9 @@ module.exports = {
 
 function quickReplies(typeMenu) {
     let initial = ["Next day", "Introduce Measures"];
-    let actions = ["Washing hands, Avoid to touch your face",
-                    "Buy tons of toilet paper",
-                    "Identify positive cases and isolate",
+    let actions = ["🧼👏, 🚫🤦",
+                    "Buy tons of 🧻",
+                    "Isolate all cases",
                     "Drinking alcohol",
                     "Next day"];
     if(typeMenu == 1){
