@@ -5,7 +5,9 @@ module.exports = df.entity(async context => {
     let messagingItem = context.df.getInput();
     context.log(`input: ${JSON.stringify(messagingItem)}`);
     let { state, responses, quickReplies } = run(messagingItem, context)
-    context.df.setState(state);
+    if (state) {
+        context.df.setState(state);
+    }
     context.df.return({
         responses,
         quickReplies

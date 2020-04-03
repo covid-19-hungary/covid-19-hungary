@@ -63,7 +63,6 @@ function handleMessage(prevState, message) {
 
     }else{
         return {
-            state: prevState,
             responses: [
                 "I don't understand",
                 "Please choose from the provided replies",

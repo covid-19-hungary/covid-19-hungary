@@ -11,8 +11,3 @@ const checkNextDay = (day, formattedDate) => {
     expect(state.day).toBe(day + 1);
     expect(responses).toContain(formattedDate);
 }
-
-test("Unexpected messages don't change the state", () => {
-    let { state } = runner.handleMessage("existing state", "Unexpected message");
-    expect(state).toBe("existing state");
-})
