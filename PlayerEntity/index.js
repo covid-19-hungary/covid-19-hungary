@@ -13,11 +13,11 @@ module.exports = df.entity(async context => {
 });
 
 const run = (messagingItem, context) => {
-    let { postback } = messagingItem;
+    let { postback, message } = messagingItem;
     if (postback && postback.payload === "get_started") {
         return runner.getStarted();
     } else {
         let prevState = context.df.getState();
-        return runner.handleMessage(prevState);
+        return runner.handleMessage(prevState, message.text);
     }
 }

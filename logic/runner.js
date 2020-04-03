@@ -18,15 +18,26 @@ function getStarted() {
     };
 }
 
-function handleMessage(prevState) {
-    let day = prevState.day + 1;
-    return {
-        state: {
-            day
-        },
-        responses: [formatDate(day)],
-        quickReplies: ["Next day"]
-    };
+function handleMessage(prevState, message) {
+    if (message == "Next day") {
+        let day = prevState.day + 1;
+        return {
+            state: {
+                day
+            },
+            responses: [formatDate(day)],
+            quickReplies: ["Next day"]
+        };
+    } else {
+        return {
+            state: prevState,
+            responses: [
+                "I don't understand",
+                "Please choose from the provided replies"
+            ],
+            quickReplies: ["Next day"]
+        }
+    }
 }
 
 const formatDate = day => {
