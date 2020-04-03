@@ -14,7 +14,7 @@ function getStarted() {
             "But you need to do this",
             "For the people"
         ],
-        quickReplies: ["Next day"]
+        quickReplies: quickReplies(1)
     };
 }
 
@@ -25,17 +25,51 @@ function handleMessage(prevState, message) {
             state: {
                 day
             },
-            responses: [formatDate(day)],
-            quickReplies: ["Next day"]
+            responses: [formatDate(day),
+                        "contagious rate is = ..%" ],
+            quickReplies: quickReplies(1)
         };
-    } else {
+    } else if(message == "Introduce Measures") {
+        return {
+            responses: ["Which measures do you want to apply?"],
+            quickReplies: quickReplies(2)
+        };
+
+    } else if(message == "Washing hands, Avoid to touch your face") {
+        return {
+            responses: ["Good one!! the contagious rate decrease",
+                        "Check Next day to see the result of your measure"],
+            quickReplies: quickReplies(2)
+        };
+    } else if(message == "Buy tons of toilet paper"){
+        return {
+            responses: ["Boo!! you are not helping at all"],
+            quickReplies: quickReplies(2)
+        };
+
+    } else if(message == "Identify positive cases and isolate"){
+        return {
+            responses: ["Good one!! the contagious rate decrease",
+                        "Check  Next day to see the result of your measure"],
+            quickReplies: quickReplies(2)
+        };
+
+    } else if(message == "Drinking alcohol"){
+        return {
+            responses: ["It is not solving anything"],
+            quickReplies: quickReplies(2)
+        };
+
+
+    }else{
         return {
             state: prevState,
             responses: [
                 "I don't understand",
-                "Please choose from the provided replies"
+                "Please choose from the provided replies",
+                "If you want to survive :o",
             ],
-            quickReplies: ["Next day"]
+            quickReplies: quickReplies(1)
         }
     }
 }
@@ -51,4 +85,18 @@ const formatDate = day => {
 module.exports = {
     getStarted,
     handleMessage
+}
+
+function quickReplies(typeMenu) {
+    let initial = ["Next day", "Introduce Measures"];
+    let actions = ["Washing hands, Avoid to touch your face",
+                    "Buy tons of toilet paper",
+                    "Identify positive cases and isolate",
+                    "Drinking alcohol",
+                    "Next day"];
+    if(typeMenu == 1){
+        return initial;
+    }else{
+        return actions;
+    }
 }
