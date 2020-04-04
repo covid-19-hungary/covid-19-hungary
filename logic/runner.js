@@ -59,8 +59,8 @@ function handleMessage(prevState, message) {
     } else if(message == "🧼👏, 🚫🤦") {
         let { day, activeInfections, deaths, recoveries, transmissionRatePerDay, measures } = prevState;
         if (!measures.some(o=>o.msg == message)){
-            let effectiveness = randomEffectiveness(5, 8);
-            let newTransmissionRate = transmissionRatePerDay - effectiveness/100;
+            let effectiveness = randomEffectiveness(15, 30);
+            let newTransmissionRate = transmissionRatePerDay * (100-effectiveness)/100;
             return {
                 state: {
                     day,
@@ -70,7 +70,7 @@ function handleMessage(prevState, message) {
                     transmissionRatePerDay: Number(newTransmissionRate.toFixed(2)),
                     measures: measures.concat([{msg:message, value:effectiveness}])
                 },
-                responses: [`Good one!! the daily contagious rate decrease ${effectiveness.toFixed(2)}%`,
+                responses: [`Good one!! the contagion rate will decrease ${effectiveness}%`,
                             "Check the 'next day' to inspect the result of your measure."],
                 quickReplies: quickReplies(2)
             };
@@ -91,8 +91,8 @@ function handleMessage(prevState, message) {
     } else if(message == "Isolate all cases"){
         let { day, activeInfections, deaths, recoveries, transmissionRatePerDay, measures } = prevState;
         if (!measures.some(o => o.msg == message)){
-            let effectiveness = randomEffectiveness(5, 8);
-            let newTransmissionRate = transmissionRatePerDay - effectiveness/100;
+            let effectiveness = randomEffectiveness(15, 30);
+            let newTransmissionRate = transmissionRatePerDay * (100-effectiveness)/100;
             return {
                 state: {
                     day,
@@ -102,7 +102,7 @@ function handleMessage(prevState, message) {
                     transmissionRatePerDay: Number(newTransmissionRate.toFixed(2)),
                     measures: measures.concat([{msg:message, value:effectiveness}])
                 },
-                responses: [`Good one!! the daily contagious rate decrease ${effectiveness.toFixed(2)}%`,
+                responses: [`Good one!! the contagion rate will decrease ${effectiveness}%`,
                             "Check the 'next day' to inspect the result of your measure."],
                 quickReplies: quickReplies(2)
             };
