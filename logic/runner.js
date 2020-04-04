@@ -1,3 +1,5 @@
+const d3 = require("d3-random");
+
 const POPULATION = 9773000;
 
 const DEFAULT_TRANSMISSION_RATE_PER_DAY = 0.33;
@@ -32,9 +34,10 @@ function handleMessage(prevState, message) {
         let { day, activeInfections, deaths, recoveries } = prevState;
         let nextDay = day + 1;
         let susceptible = POPULATION - activeInfections - deaths - recoveries;
-        let newInfections = Math.round(DEFAULT_TRANSMISSION_RATE_PER_DAY * susceptible * activeInfections / POPULATION);
-        let newRecoveries = Math.round(DEFAULT_RECOVERY_RATE_PER_DAY * activeInfections);
-        let newDeaths = Math.round(DEATH_RATE_PER_DAY * activeInfections);
+        let infectionProbability = DEFAULT_TRANSMISSION_RATE_PER_DAY * activeInfections / POPULATION;
+        let newInfections = d3.randomBinomial(susceptible, infectionProbability)();
+        let newRecoveries = d3.randomBinomial(activeInfections, DEFAULT_RECOVERY_RATE_PER_DAY)();
+        let newDeaths = d3.randomBinomial(activeInfections, DEATH_RATE_PER_DAY)();
         let newState = {
             day: nextDay,
             activeInfections: activeInfections + newInfections - newRecoveries - newDeaths,
@@ -109,6 +112,7 @@ const formatDate = day => {
 }
 
 module.exports = {
+    POPULATION,
     getStarted,
     handleMessage
 }

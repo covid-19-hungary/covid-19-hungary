@@ -8,6 +8,7 @@
     "watch": "jest --watch"
   },
   "dependencies": {
+    "d3-random": "^2.1.0",
     "durable-functions": "^1.3.3"
   },
   "devDependencies": {
