@@ -12,7 +12,7 @@ test('"Next day" advances the day', () => {
 });
 
 test('"Apply measures" reduce the transmission rate', () => {
-    let prevState = { day: 0, activeInfections: 0, deaths: 0, recoveries: 0,  transmissionRatePerDay: 0.33};
+    let prevState = { day: 0, activeInfections: 0, deaths: 0, recoveries: 0,  transmissionRatePerDay: 0.33, measures:[]};
     checkTransmissionRateDecrease(prevState,"🧼👏, 🚫🤦");
     checkTransmissionRateDecrease(prevState,"Isolate all cases");
 });
@@ -20,6 +20,8 @@ test('"Apply measures" reduce the transmission rate', () => {
 const checkTransmissionRateDecrease = (prevState, Measure) => {
     let { state, responses } = runner.handleMessage(prevState, Measure);
     expect(state.transmissionRatePerDay).toBeLessThan(prevState.transmissionRatePerDay);
+    expect(state.transmissionRatePerDay).toBeGreaterThan(0);
+    expect(state.measures.some(o => o.msg == Measure)).toBe(true);
 }
 
 const checkNextDay = (prevState, formattedDate) => {

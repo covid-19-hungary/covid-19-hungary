@@ -13,7 +13,8 @@ function getStarted() {
         activeInfections: 20,
         deaths: 0,
         recoveries: 0,
-        transmissionRatePerDay: 0.33
+        transmissionRatePerDay: 0.33,
+        measures:[]
     };
     return {
         state,
@@ -33,7 +34,7 @@ function getStarted() {
 
 function handleMessage(prevState, message) {
     if (message == "Next day") {
-        let { day, activeInfections, deaths, recoveries, transmissionRatePerDay } = prevState;
+        let { day, activeInfections, deaths, recoveries, transmissionRatePerDay, measures } = prevState;
         let nextDay = day + 1;
         let susceptible = POPULATION - activeInfections - deaths - recoveries;
         let infectionProbability = transmissionRatePerDay * activeInfections / POPULATION;
@@ -45,7 +46,8 @@ function handleMessage(prevState, message) {
             activeInfections: activeInfections + newInfections - newRecoveries - newDeaths,
             deaths: deaths + newDeaths,
             recoveries: recoveries + newRecoveries,
-            transmissionRatePerDay
+            transmissionRatePerDay,
+            measures
         };
         return {
             state: newState,
@@ -59,19 +61,31 @@ function handleMessage(prevState, message) {
         };
 
     } else if(message == "🧼👏, 🚫🤦") {
-        let { day, activeInfections, deaths, recoveries, transmissionRatePerDay } = prevState;
-        return {
-            state: {
-                day,
-                activeInfections,
-                deaths,
-                recoveries,
-                transmissionRatePerDay: transmissionRatePerDay - randomEffectiveness(0.5, 0.8)
-            },
-            responses: [`Good one!! the daily contagious rate decrease ${transmissionRatePerDay * 10}%`,
-                        "Check the 'next day' to inspect the result of your measure."],
-            quickReplies: quickReplies(2)
+        let { day, activeInfections, deaths, recoveries, transmissionRatePerDay, measures } = prevState;
+        if (!measures.some(o=>o.msg == message)){
+            let effectiveness = randomEffectiveness(5, 8);
+            let newTransmissionRate = transmissionRatePerDay - effectiveness/100;
+            return {
+                state: {
+                    day,
+                    activeInfections,
+                    deaths,
+                    recoveries,
+                    transmissionRatePerDay: Number(newTransmissionRate.toFixed(2)),
+                    measures: measures.concat([{msg:message, value:effectiveness}])
+                },
+                responses: [`Good one!! the daily contagious rate decrease ${effectiveness.toFixed(2)}%`,
+                            "Check the 'next day' to inspect the result of your measure."],
+                quickReplies: quickReplies(2)
+            };
+        }else{
+            return {
+                responses: ["You already applied this measure",
+                            "Check the 'next day' to inspect the result of your measure."],
+                quickReplies: quickReplies(2)
+            };
         };
+
     } else if(message == "Buy tons of 🧻"){
         return {
             responses: ["Boo!! you are not helping at all"],
@@ -79,18 +93,29 @@ function handleMessage(prevState, message) {
         };
 
     } else if(message == "Isolate all cases"){
-        let { day, activeInfections, deaths, recoveries, transmissionRatePerDay } = prevState;
-        return {
-            state: {
-                day,
-                activeInfections,
-                deaths,
-                recoveries,
-                transmissionRatePerDay: transmissionRatePerDay - randomEffectiveness(0.5, 0.8)
-            },
-            responses: [`Good one!! the daily contagious rate decrease ${transmissionRatePerDay * 10}%`,
-                        "Check the 'next day' to inspect the result of your measure."],
-            quickReplies: quickReplies(2)
+        let { day, activeInfections, deaths, recoveries, transmissionRatePerDay, measures } = prevState;
+        if (!measures.some(o => o.msg == message)){
+            let effectiveness = randomEffectiveness(5, 8);
+            let newTransmissionRate = transmissionRatePerDay - effectiveness/100;
+            return {
+                state: {
+                    day,
+                    activeInfections,
+                    deaths,
+                    recoveries,
+                    transmissionRatePerDay: Number(newTransmissionRate.toFixed(2)),
+                    measures: measures.concat([{msg:message, value:effectiveness}])
+                },
+                responses: [`Good one!! the daily contagious rate decrease ${effectiveness.toFixed(2)}%`,
+                            "Check the 'next day' to inspect the result of your measure."],
+                quickReplies: quickReplies(2)
+            };
+        }else{
+            return {
+                responses: ["You already applied this measure",
+                            "Check the 'next day' to inspect the result of your measure."],
+                quickReplies: quickReplies(2)
+            };
         };
 
     } else if(message == "Drinking alcohol"){
@@ -138,10 +163,8 @@ module.exports = {
     handleMessage
 }
 
-function randomEffectiveness(from, to){
-    max = from * 10;
-    min = to * 10;
-    return Math.floor(Math.random() * (max - min + 1) + min)/10;
+function randomEffectiveness(max, min){
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 function quickReplies(typeMenu) {
