@@ -2,8 +2,8 @@ const d3 = require("d3-random");
 
 const POPULATION = 9773000;
 
-const DEFAULT_RECOVERY_RATE_PER_DAY = 0.05;
-const DEATH_RATE_PER_DAY = 0.0003; // TODO: with and without treatment
+const RECOVERY_RATE_PER_DAY = 0.07; // it takes about 2 weeks to recover
+const DEATH_RATE_PER_DAY = 0.01 * RECOVERY_RATE_PER_DAY; // about 1% of people die instead of recovering
 
 const FRACTION_OF_INFECTED_PEOPLE_TESTED = 0.1;
 
@@ -39,7 +39,7 @@ function handleMessage(prevState, message) {
         let susceptible = POPULATION - activeInfections - deaths - recoveries;
         let infectionProbability = transmissionRatePerDay * activeInfections / POPULATION;
         let newInfections = d3.randomBinomial(susceptible, infectionProbability)();
-        let newRecoveries = d3.randomBinomial(activeInfections, DEFAULT_RECOVERY_RATE_PER_DAY)();
+        let newRecoveries = d3.randomBinomial(activeInfections, RECOVERY_RATE_PER_DAY)();
         let newDeaths = d3.randomBinomial(activeInfections, DEATH_RATE_PER_DAY)();
         let newState = {
             day: nextDay,
