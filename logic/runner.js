@@ -1,8 +1,17 @@
+const POPULATION = 9773000;
+
+const DEFAULT_TRANSMISSION_RATE_PER_DAY = 0.33;
+const DEFAULT_RECOVERY_RATE_PER_DAY = 0.05;
+const DEATH_RATE_PER_DAY = 0.0003; // TODO: with and without treatment
+
 function getStarted() {
     let day = 0;
     return {
         state: {
-            day
+            day,
+            activeInfections: 20,
+            deaths: 0,
+            recoveries: 0
         },
         responses: [
             formatDate(day),
@@ -20,13 +29,25 @@ function getStarted() {
 
 function handleMessage(prevState, message) {
     if (message == "Next day") {
-        let day = prevState.day + 1;
+        let { day, activeInfections, deaths, recoveries } = prevState;
+        let nextDay = day + 1;
+        let susceptible = POPULATION - activeInfections - deaths - recoveries;
+        let newInfections = Math.round(DEFAULT_TRANSMISSION_RATE_PER_DAY * susceptible * activeInfections / POPULATION);
+        let newRecoveries = Math.round(DEFAULT_RECOVERY_RATE_PER_DAY * activeInfections);
+        let newDeaths = Math.round(DEATH_RATE_PER_DAY * activeInfections);
         return {
             state: {
-                day
+                day: nextDay,
+                activeInfections: activeInfections + newInfections - newRecoveries - newDeaths,
+                deaths: deaths + newDeaths,
+                recoveries: recoveries + newRecoveries
             },
-            responses: [formatDate(day),
-                        "contagious rate is = ..%" ],
+            responses: [
+                formatDate(nextDay),
+                `Coronavirus cases: ${activeInfections + deaths + recoveries}\n` + // TODO: only show known ones
+                `Deaths: ${deaths}\n` +
+                `Recovered: ${recoveries}` // TODO: only show known ones
+            ],
             quickReplies: quickReplies(1)
         };
     } else if(message == "Introduce Measures") {
