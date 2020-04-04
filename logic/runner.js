@@ -2,7 +2,6 @@ const d3 = require("d3-random");
 
 const POPULATION = 9773000;
 
-const DEFAULT_TRANSMISSION_RATE_PER_DAY = 0.33;
 const DEFAULT_RECOVERY_RATE_PER_DAY = 0.05;
 const DEATH_RATE_PER_DAY = 0.0003; // TODO: with and without treatment
 
@@ -11,7 +10,8 @@ function getStarted() {
         day: 0,
         activeInfections: 20,
         deaths: 0,
-        recoveries: 0
+        recoveries: 0,
+        transmissionRatePerDay: 0.33
     };
     return {
         state,
@@ -31,10 +31,10 @@ function getStarted() {
 
 function handleMessage(prevState, message) {
     if (message == "Next day") {
-        let { day, activeInfections, deaths, recoveries } = prevState;
+        let { day, activeInfections, deaths, recoveries, transmissionRatePerDay } = prevState;
         let nextDay = day + 1;
         let susceptible = POPULATION - activeInfections - deaths - recoveries;
-        let infectionProbability = DEFAULT_TRANSMISSION_RATE_PER_DAY * activeInfections / POPULATION;
+        let infectionProbability = transmissionRatePerDay * activeInfections / POPULATION;
         let newInfections = d3.randomBinomial(susceptible, infectionProbability)();
         let newRecoveries = d3.randomBinomial(activeInfections, DEFAULT_RECOVERY_RATE_PER_DAY)();
         let newDeaths = d3.randomBinomial(activeInfections, DEATH_RATE_PER_DAY)();
@@ -42,7 +42,8 @@ function handleMessage(prevState, message) {
             day: nextDay,
             activeInfections: activeInfections + newInfections - newRecoveries - newDeaths,
             deaths: deaths + newDeaths,
-            recoveries: recoveries + newRecoveries
+            recoveries: recoveries + newRecoveries,
+            transmissionRatePerDay
         };
         return {
             state: newState,
@@ -56,8 +57,16 @@ function handleMessage(prevState, message) {
         };
 
     } else if(message == "🧼👏, 🚫🤦") {
+        let { day, activeInfections, deaths, recoveries, transmissionRatePerDay } = prevState;
         return {
-            responses: ["Good one!! the contagious rate decrease",
+            state: {
+                day,
+                activeInfections,
+                deaths,
+                recoveries,
+                transmissionRatePerDay: transmissionRatePerDay - randomEffectiveness(0.5, 0.8)
+            },
+            responses: [`Good one!! the daily contagious rate decrease ${transmissionRatePerDay * 10}%`,
                         "Check the 'next day' to inspect the result of your measure."],
             quickReplies: quickReplies(2)
         };
@@ -68,8 +77,16 @@ function handleMessage(prevState, message) {
         };
 
     } else if(message == "Isolate all cases"){
+        let { day, activeInfections, deaths, recoveries, transmissionRatePerDay } = prevState;
         return {
-            responses: ["Good one!! the contagious rate decrease",
+            state: {
+                day,
+                activeInfections,
+                deaths,
+                recoveries,
+                transmissionRatePerDay: transmissionRatePerDay - randomEffectiveness(0.5, 0.8)
+            },
+            responses: [`Good one!! the daily contagious rate decrease ${transmissionRatePerDay * 10}%`,
                         "Check the 'next day' to inspect the result of your measure."],
             quickReplies: quickReplies(2)
         };
@@ -115,6 +132,12 @@ module.exports = {
     POPULATION,
     getStarted,
     handleMessage
+}
+
+function randomEffectiveness(from, to){
+    max = from * 10;
+    min = to * 10;
+    return Math.floor(Math.random() * (max - min + 1) + min)/10;
 }
 
 function quickReplies(typeMenu) {

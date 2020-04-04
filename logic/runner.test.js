@@ -6,10 +6,21 @@ test('getStarted should return an array of responses', () => {
 })
 
 test('"Next day" advances the day', () => {
-    checkNextDay({ day: 0, activeInfections: 0, deaths: 0, recoveries: 0 }, "2020-03-05");
-    checkNextDay({ day: 26, activeInfections: 500, deaths: 15, recoveries: 50 }, "2020-03-31");
-    checkNextDay({ day: 27, activeInfections: 9000000, deaths: 100000, recoveries: 200000 }, "2020-04-01");
+    checkNextDay({ day: 0, activeInfections: 0, deaths: 0, recoveries: 0, transmissionRatePerDay: 0.33 }, "2020-03-05");
+    checkNextDay({ day: 26, activeInfections: 500, deaths: 15, recoveries: 50, transmissionRatePerDay: 0.33 }, "2020-03-31");
+    checkNextDay({ day: 27, activeInfections: 9000000, deaths: 100000, recoveries: 200000, transmissionRatePerDay: 0.33 }, "2020-04-01");
 });
+
+test('"Apply measures" reduce the transmission rate', () => {
+    let prevState = { day: 0, activeInfections: 0, deaths: 0, recoveries: 0,  transmissionRatePerDay: 0.33};
+    checkTransmissionRateDecrease(prevState,"🧼👏, 🚫🤦");
+    checkTransmissionRateDecrease(prevState,"Isolate all cases");
+});
+
+const checkTransmissionRateDecrease = (prevState, Measure) => {
+    let { state, responses } = runner.handleMessage(prevState, Measure);
+    expect(state.transmissionRatePerDay).toBeLessThan(prevState.transmissionRatePerDay);
+}
 
 const checkNextDay = (prevState, formattedDate) => {
     let { state, responses } = runner.handleMessage(prevState, "Next day");
