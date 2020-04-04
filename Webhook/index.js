@@ -21,27 +21,26 @@ module.exports = async function (context, req) {
         }
     } else if (req.method === "POST") {
         let client = df.getClient(context);
-        let instanceIds = await Promise.all(req.body.entry.flatMap(entry => {
-            return entry.messaging.map(async messagingItem => {
-                let instanceId = `${entry.time}-${messagingItem.sender.id}`;
-                // The player should be able to send only a single message/postback at a time.
-                // If an instance with this instanceId already exists, this is probably a retried
-                // webhook call, which we shouldn't handle.
-                let existingInstance = await client.getStatus(instanceId);
-                if (existingInstance) {
-                    return instanceId;
-                } else {
-                    // There is race condition here.
-                    // If the original webhook call's and a retried webhook call's processing reach
-                    // this point at the same time, then both will start the orchestration.
-                    // However, the chances of that are low enough, since FB only retries the call
-                    // every few seconds.
-                    return client.startNew("MessageHandler", instanceId, {
-                        messagingItem,
-                        pageAccessToken: PAGE_ACCESS_TOKEN
-                    });
-                }
-            })
+        let messagingItems = req.body.entry.flatMap(entry => entry.messaging);
+        let instanceIds = await Promise.all(messagingItems.map(async messagingItem => {
+            let instanceId = `${messagingItem.timestamp}-${messagingItem.sender.id}`;
+            // The player should be able to send only a single message/postback at a time.
+            // If an instance with this instanceId already exists, this is probably a retried
+            // webhook call, which we shouldn't handle.
+            let existingInstance = await client.getStatus(instanceId);
+            if (existingInstance) {
+                return instanceId;
+            } else {
+                // There is race condition here.
+                // If the original webhook call's and a retried webhook call's processing reach
+                // this point at the same time, then both will start the orchestration.
+                // However, the chances of that are low enough, since FB only retries the call
+                // every few seconds.
+                return client.startNew("MessageHandler", instanceId, {
+                    messagingItem,
+                    pageAccessToken: PAGE_ACCESS_TOKEN
+                });
+            }
         }));
         context.log("MessageHandler instances started: " + instanceIds.join(", "));
         return {
