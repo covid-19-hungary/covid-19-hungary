@@ -5,16 +5,16 @@ const DEFAULT_RECOVERY_RATE_PER_DAY = 0.05;
 const DEATH_RATE_PER_DAY = 0.0003; // TODO: with and without treatment
 
 function getStarted() {
-    let day = 0;
+    let state = {
+        day: 0,
+        activeInfections: 20,
+        deaths: 0,
+        recoveries: 0
+    };
     return {
-        state: {
-            day,
-            activeInfections: 20,
-            deaths: 0,
-            recoveries: 0
-        },
+        state,
         responses: [
-            formatDate(day),
+            ...dailyReport(state),
             "Covid-19 has reached Hungary",
             "You've been selected to lead the crisis management",
             "I'd congratulate you, but you won't like this",
@@ -35,19 +35,15 @@ function handleMessage(prevState, message) {
         let newInfections = Math.round(DEFAULT_TRANSMISSION_RATE_PER_DAY * susceptible * activeInfections / POPULATION);
         let newRecoveries = Math.round(DEFAULT_RECOVERY_RATE_PER_DAY * activeInfections);
         let newDeaths = Math.round(DEATH_RATE_PER_DAY * activeInfections);
+        let newState = {
+            day: nextDay,
+            activeInfections: activeInfections + newInfections - newRecoveries - newDeaths,
+            deaths: deaths + newDeaths,
+            recoveries: recoveries + newRecoveries
+        };
         return {
-            state: {
-                day: nextDay,
-                activeInfections: activeInfections + newInfections - newRecoveries - newDeaths,
-                deaths: deaths + newDeaths,
-                recoveries: recoveries + newRecoveries
-            },
-            responses: [
-                formatDate(nextDay),
-                `Coronavirus cases: ${activeInfections + deaths + recoveries}\n` + // TODO: only show known ones
-                `Deaths: ${deaths}\n` +
-                `Recovered: ${recoveries}` // TODO: only show known ones
-            ],
+            state: newState,
+            responses: dailyReport(newState),
             quickReplies: quickReplies(1)
         };
     } else if(message == "Introduce Measures") {
@@ -92,6 +88,16 @@ function handleMessage(prevState, message) {
             quickReplies: quickReplies(1)
         }
     }
+}
+
+const dailyReport = state => {
+    let { day, activeInfections, deaths, recoveries } = state;
+    return [
+        formatDate(day),
+        `Coronavirus cases: ${activeInfections + deaths + recoveries}\n` + // TODO: only show known ones
+        `Deaths: ${deaths}\n` +
+        `Recovered: ${recoveries}` // TODO: only show known ones
+    ];
 }
 
 const formatDate = day => {
