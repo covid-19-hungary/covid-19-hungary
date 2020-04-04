@@ -22,11 +22,7 @@ function getStarted() {
             ...dailyReport(state),
             "Covid-19 has reached Hungary",
             "You've been selected to lead the crisis management",
-            "I'd congratulate you, but you won't like this",
-            "The shitstorm is coming",
-            "Whatever you do, many will hate you",
-            "But you need to do this",
-            "For the people"
+            "Good luck"
         ],
         quickReplies: quickReplies(1)
     };
