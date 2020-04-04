@@ -5,6 +5,8 @@ const POPULATION = 9773000;
 const DEFAULT_RECOVERY_RATE_PER_DAY = 0.05;
 const DEATH_RATE_PER_DAY = 0.0003; // TODO: with and without treatment
 
+const FRACTION_OF_INFECTED_PEOPLE_TESTED = 0.1;
+
 function getStarted() {
     let state = {
         day: 0,
@@ -112,11 +114,13 @@ function handleMessage(prevState, message) {
 
 const dailyReport = state => {
     let { day, activeInfections, deaths, recoveries } = state;
+    let confirmedActive = Math.round(FRACTION_OF_INFECTED_PEOPLE_TESTED * activeInfections);
+    let confirmedRecoveries = Math.round(FRACTION_OF_INFECTED_PEOPLE_TESTED * recoveries);
     return [
         formatDate(day),
-        `Coronavirus cases: ${activeInfections + deaths + recoveries}\n` + // TODO: only show known ones
+        `Coronavirus cases: ${confirmedActive + deaths + confirmedRecoveries}\n` +
         `Deaths: ${deaths}\n` +
-        `Recovered: ${recoveries}` // TODO: only show known ones
+        `Recovered: ${confirmedRecoveries}`
     ];
 }
 
