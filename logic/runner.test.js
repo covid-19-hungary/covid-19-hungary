@@ -31,5 +31,6 @@ const checkNextDay = (prevState, formattedDate) => {
     expect(state.deaths).toBeLessThanOrEqual(prevState.deaths + prevState.activeInfections);
     expect(state.recoveries).toBeGreaterThanOrEqual(prevState.recoveries);
     expect(state.recoveries).toBeLessThanOrEqual(prevState.recoveries + prevState.activeInfections);
+    expect(state.transmissionRatePerDay).toBe(prevState.transmissionRatePerDay);
     expect(responses).toContain(formattedDate);
 }
